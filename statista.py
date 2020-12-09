@@ -1,6 +1,7 @@
 # importing modules
 import requests
 from bs4 import BeautifulSoup
+import texttable as tt
 
 # URL for scrapping data
 url = 'https://www.statista.com/statistics/1104709/coronavirus-deaths-worldwide-per-million-inhabitants/'
@@ -27,18 +28,24 @@ while True:
         population = next(data_iterator).text
         deaths_1m = next(data_iterator).text
         deaths_1m_last7 = next(data_iterator).text
+        deaths = deaths.replace(',', '')
+        deaths_last7 = deaths_last7.replace(',', '')
+        deaths_daily_increase = deaths_daily_increase.replace(',', '')
+        population = population.replace(',', '')
+        deaths_1m = deaths_1m.replace(',', '')
+        deaths_1m_last7 = deaths_1m_last7.replace(',', '')
 
         # For 'confirmed' and 'deaths',
         # make sure to remove the commas
         # and convert to int
         data.append((
             country,
-            int(deaths.replace(',', '')),
-            int(deaths_last7.replace(',', '')),
-            int(deaths_daily_increase.replace(',', '')),
-            float(population.replace(',', '')),
-            float(deaths_1m.replace(',', '')),
-            float(deaths_1m_last7.replace(',', ''))
+            int(deaths),
+            int(deaths_last7),
+            int(deaths_daily_increase),
+            float(population),
+            float(deaths_1m),
+            float(deaths_1m_last7)
         ))
 
     # StopIteration error is raised when
@@ -49,4 +56,16 @@ while True:
 
 # Sort the data by the number of confirmed cases
 data.sort(key=lambda row: row[1], reverse=True)
-print(data)
+
+# create texttable object
+table = tt.Texttable()
+
+# Add an empty row at the beginning for the headers
+table.add_rows([(None, None, None, None, None, None, None)] + data)
+
+# 'l' denotes left, 'c' denotes center,
+# and 'r' denotes right
+table.set_cols_align(('c', 'c', 'c', 'c', 'c', 'c', 'c'))
+table.header((' Country ', ' Deaths ', ' Deaths (last 7 days) ', ' Deaths (daily increase)', ' Population ', ' Deaths (per 1m)', ' Deaths (per 1m last 7 days)'))
+
+print(table.draw())
