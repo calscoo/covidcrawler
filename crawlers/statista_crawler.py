@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def scrape():
+def crawl():
     url = 'https://www.statista.com/statistics/1104709/coronavirus-deaths-worldwide-per-million-inhabitants/'
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
